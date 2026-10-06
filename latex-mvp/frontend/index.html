@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LaTeX Studio</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://esm.sh">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-logo">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <span>LaTeX Studio</span>
+      </div>
+      <div class="header-status-indicator" id="collab-status">
+        <span class="status-dot" id="collab-dot"></span>
+        <span id="collab-text">Online</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Bibliography Manager Trigger -->
+      <button class="btn btn-outline btn-sm" id="btn-open-bib-modal" title="Gerenciador de referências BibTeX (DOI, arXiv, BibTeX)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>Referências</span>
+      </button>
+
+      <!-- AI Assistant Trigger -->
+      <button class="btn btn-outline btn-sm" id="btn-open-ai-modal" title="Assistente de Layout e Tabelas com IA">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+        </svg>
+        <span>Assistente IA</span>
+      </button>
+
+      <!-- Compile Button -->
+      <button class="btn btn-success btn-sm" id="btn-compile" title="Atalho: Ctrl+Enter / Cmd+Enter">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="6 4 20 12 6 20 6 4"></polygon>
+        </svg>
+        <span>Recompilar</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="workspace-container">
+
+    <!-- 1. Left Sidebar: File Tree & Project Files -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title">ARQUIVOS</span>
+        <div class="sidebar-header-actions">
+          <button class="btn-icon" id="btn-new-file" title="Novo Arquivo">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+          <button class="btn-icon" id="btn-upload-file" title="Upload de Arquivo">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          </button>
+          <input type="file" id="file-upload-input" multiple accept=".tex,.bib,.sty,.cls,.txt,.png,.jpg,.jpeg,.pdf" style="display:none;">
+        </div>
+      </div>
+
+      <div class="file-list" id="file-tree-container">
+        <!-- Dynamically rendered by app.js -->
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-info" id="sidebar-bib-counter">
+          <span>0 referências em references.bib</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. Center Panel: CodeMirror 6 Editor -->
+    <section class="editor-panel">
+      <!-- Tabs & Toolbar Header -->
+      <div class="editor-header-bar">
+        <!-- Open Files Tabs -->
+        <div class="file-tab-bar" id="editor-tabs-container">
+          <!-- Dynamically populated by app.js -->
+        </div>
+
+        <!-- Inline Editor Toolbar -->
+        <div class="editor-toolbar">
+          <!-- Typography -->
+          <div class="toolbar-group">
+            <button class="tool-btn" data-action="bold" title="Negrito (\textbf)"><strong>B</strong></button>
+            <button class="tool-btn" data-action="italic" title="Itálico (\textit)"><em>I</em></button>
+            <button class="tool-btn" data-action="section" title="Nova Seção (\section)">§ Sec</button>
+          </div>
+
+          <div class="toolbar-sep"></div>
+
+          <!-- Math Mode & Operators -->
+          <div class="toolbar-group">
+            <button class="tool-btn" data-action="inlineMath" title="Modo matemático inline ($...$)">$x$</button>
+            <button class="tool-btn" data-action="frac" title="Fração (\frac{a}{b})">a/b</button>
+            <button class="tool-btn" data-action="sqrt" title="Raiz quadrada (\sqrt{x})">√x</button>
+            <button class="tool-btn" data-action="sum" title="Somatório (\sum)">∑</button>
+            <button class="tool-btn" data-action="integral" title="Integral (\int)">∫</button>
+          </div>
+
+          <div class="toolbar-sep"></div>
+
+          <!-- Greek Letters Dropdown Trigger -->
+          <div class="toolbar-group">
+            <button class="tool-btn dropdown-trigger" id="btn-greek-menu" title="Letras Gregas e Símbolos">
+              <span>Ω Gregas</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+          </div>
+
+          <div class="toolbar-sep"></div>
+
+          <!-- Structures & Citations -->
+          <div class="toolbar-group">
+            <button class="tool-btn" data-action="tableBooktabs" title="Tabela Booktabs">Tab</button>
+            <button class="tool-btn" data-action="figure" title="Figura flutuante">Fig</button>
+            <button class="tool-btn dropdown-trigger" id="btn-toolbar-cite" title="Inserir Citação (\cite) de references.bib">
+              <span>\cite</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <button class="tool-btn dropdown-trigger" id="btn-toolbar-ref" title="Inserir Referência Cruzada (\ref)">
+              <span>\ref</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CodeMirror 6 Mount Node -->
+      <div class="editor-container" id="editor-mount"></div>
+    </section>
+
+    <!-- 3. Right Panel: PDF Viewer & Minimal Collapsible Console -->
+    <section class="preview-panel">
+      <div class="preview-header-bar">
+        <span class="preview-title">Visualização do PDF</span>
+        <div class="preview-actions">
+          <a class="btn btn-outline btn-xs hidden" id="btn-download-pdf" href="#" target="_blank" download="documento.pdf">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Baixar PDF
+          </a>
+        </div>
+      </div>
+
+      <iframe class="pdf-viewer-frame hidden" id="pdf-frame" src="about:blank"></iframe>
+
+      <div class="pdf-empty-placeholder" id="pdf-placeholder">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <p>Pressione <strong>Ctrl+Enter</strong> para compilar o documento.</p>
+      </div>
+
+      <!-- Collapsible Console Footer -->
+      <div class="console-panel collapsed" id="console-panel">
+        <div class="console-header" id="console-toggle">
+          <div class="console-tabs">
+            <span class="console-status-dot" id="console-status-dot"></span>
+            <button class="console-tab-btn active" data-tab="errors">
+              Erros & Alertas
+              <span class="error-count-badge hidden" id="error-badge">0</span>
+            </button>
+            <button class="console-tab-btn" data-tab="rawlog">Log Completo</button>
+          </div>
+          <span class="console-toggle-arrow" id="console-arrow">▲ Expandir</span>
+        </div>
+
+        <div class="console-body" id="console-body">
+          <div id="tab-errors-view">
+            <div class="no-errors-message" id="no-errors-msg">Nenhum erro de compilação detectado.</div>
+            <div id="error-items-container"></div>
+          </div>
+          <div id="tab-rawlog-view" class="hidden">
+            <pre class="raw-log-view" id="raw-log-content">Aguardando compilação...</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= POPOVERS FLUTUANTES ================= -->
+
+  <!-- 1. Greek Letters & Math Symbols Popover -->
+  <div class="editor-popover hidden" id="popover-greek">
+    <div class="popover-tabs">
+      <button class="popover-tab-btn active" data-tab="lower">Minúsculas</button>
+      <button class="popover-tab-btn" data-tab="upper">Maiúsculas</button>
+      <button class="popover-tab-btn" data-tab="ops">Operadores</button>
+    </div>
+
+    <!-- Lower Greek Letters -->
+    <div class="popover-tab-pane active" id="pane-greek-lower">
+      <div class="symbol-palette-grid">
+        <button class="sym-grid-btn" data-symbol="\alpha" title="\alpha">α</button>
+        <button class="sym-grid-btn" data-symbol="\beta" title="\beta">β</button>
+        <button class="sym-grid-btn" data-symbol="\gamma" title="\gamma">γ</button>
+        <button class="sym-grid-btn" data-symbol="\delta" title="\delta">δ</button>
+        <button class="sym-grid-btn" data-symbol="\epsilon" title="\epsilon">ε</button>
+        <button class="sym-grid-btn" data-symbol="\zeta" title="\zeta">ζ</button>
+        <button class="sym-grid-btn" data-symbol="\eta" title="\eta">η</button>
+        <button class="sym-grid-btn" data-symbol="\theta" title="\theta">θ</button>
+        <button class="sym-grid-btn" data-symbol="\iota" title="\iota">ι</button>
+        <button class="sym-grid-btn" data-symbol="\kappa" title="\kappa">κ</button>
+        <button class="sym-grid-btn" data-symbol="\lambda" title="\lambda">λ</button>
+        <button class="sym-grid-btn" data-symbol="\mu" title="\mu">μ</button>
+        <button class="sym-grid-btn" data-symbol="\nu" title="\nu">ν</button>
+        <button class="sym-grid-btn" data-symbol="\xi" title="\xi">ξ</button>
+        <button class="sym-grid-btn" data-symbol="\pi" title="\pi">π</button>
+        <button class="sym-grid-btn" data-symbol="\rho" title="\rho">ρ</button>
+        <button class="sym-grid-btn" data-symbol="\sigma" title="\sigma">σ</button>
+        <button class="sym-grid-btn" data-symbol="\tau" title="\tau">τ</button>
+        <button class="sym-grid-btn" data-symbol="\upsilon" title="\upsilon">υ</button>
+        <button class="sym-grid-btn" data-symbol="\phi" title="\phi">φ</button>
+        <button class="sym-grid-btn" data-symbol="\chi" title="\chi">χ</button>
+        <button class="sym-grid-btn" data-symbol="\psi" title="\psi">ψ</button>
+        <button class="sym-grid-btn" data-symbol="\omega" title="\omega">ω</button>
+      </div>
+    </div>
+
+    <!-- Upper Greek Letters -->
+    <div class="popover-tab-pane" id="pane-greek-upper">
+      <div class="symbol-palette-grid">
+        <button class="sym-grid-btn" data-symbol="\Gamma" title="\Gamma">Γ</button>
+        <button class="sym-grid-btn" data-symbol="\Delta" title="\Delta">Δ</button>
+        <button class="sym-grid-btn" data-symbol="\Theta" title="\Theta">Θ</button>
+        <button class="sym-grid-btn" data-symbol="\Lambda" title="\Lambda">Λ</button>
+        <button class="sym-grid-btn" data-symbol="\Xi" title="\Xi">Ξ</button>
+        <button class="sym-grid-btn" data-symbol="\Pi" title="\Pi">Π</button>
+        <button class="sym-grid-btn" data-symbol="\Sigma" title="\Sigma">Σ</button>
+        <button class="sym-grid-btn" data-symbol="\Upsilon" title="\Upsilon">Υ</button>
+        <button class="sym-grid-btn" data-symbol="\Phi" title="\Phi">Φ</button>
+        <button class="sym-grid-btn" data-symbol="\Psi" title="\Psi">Ψ</button>
+        <button class="sym-grid-btn" data-symbol="\Omega" title="\Omega">Ω</button>
+      </div>
+    </div>
+
+    <!-- Operators -->
+    <div class="popover-tab-pane" id="pane-greek-ops">
+      <div class="symbol-palette-grid">
+        <button class="sym-grid-btn" data-symbol="\nabla" title="\nabla">∇</button>
+        <button class="sym-grid-btn" data-symbol="\infty" title="\infty">∞</button>
+        <button class="sym-grid-btn" data-symbol="\partial" title="\partial">∂</button>
+        <button class="sym-grid-btn" data-symbol="\pm" title="\pm">±</button>
+        <button class="sym-grid-btn" data-symbol="\times" title="\times">×</button>
+        <button class="sym-grid-btn" data-symbol="\cdot" title="\cdot">·</button>
+        <button class="sym-grid-btn" data-symbol="\leq" title="\leq">≤</button>
+        <button class="sym-grid-btn" data-symbol="\geq" title="\geq">≥</button>
+        <button class="sym-grid-btn" data-symbol="\neq" title="\neq">≠</button>
+        <button class="sym-grid-btn" data-symbol="\approx" title="\approx">≈</button>
+        <button class="sym-grid-btn" data-symbol="\in" title="\in">∈</button>
+        <button class="sym-grid-btn" data-symbol="\subset" title="\subset">⊂</button>
+        <button class="sym-grid-btn" data-symbol="\to" title="\to">→</button>
+        <button class="sym-grid-btn" data-symbol="\implies" title="\implies">⇒</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Fast Citation Picker Popover -->
+  <div class="editor-popover hidden" id="popover-cite" style="width: 320px;">
+    <div class="popover-header">
+      <input type="text" class="text-input" id="cite-popover-search" placeholder="Filtrar referências...">
+    </div>
+    <div class="popover-list" id="cite-popover-list">
+      <!-- Populated dynamically -->
+    </div>
+  </div>
+
+  <!-- 3. Cross-reference Picker Popover -->
+  <div class="editor-popover hidden" id="popover-ref" style="width: 260px;">
+    <div class="popover-header-title">Selecione uma referência:</div>
+    <div class="popover-list" id="ref-popover-list">
+      <!-- Populated dynamically -->
+    </div>
+  </div>
+
+  <!-- ================= MODAIS ================= -->
+
+  <!-- 1. Bibliography Manager Modal -->
+  <div class="modal-overlay hidden" id="bib-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          Gerenciador de Bibliografia (DOI, arXiv, BibTeX)
+        </div>
+        <button class="modal-close" id="bib-modal-close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-hint">
+          Resolução determinística direta via <strong>DOI</strong> (ex: <code>10.1103/PhysRevLett.116.061102</code>), 
+          <strong>arXiv ID</strong> (ex: <code>2301.00000</code>), URL ou texto livre.
+        </p>
+
+        <div class="input-group">
+          <input type="text" class="text-input" id="bib-query-input" placeholder="Cole DOI, link arXiv, URL web ou citação...">
+          <button class="btn btn-primary" id="bib-search-btn">Buscar BibTeX</button>
+        </div>
+
+        <div class="hidden" id="bib-loading-spinner" style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:#93c5fd; margin-bottom:10px;">
+          <div class="spinner"></div>
+          <span>Buscando referência...</span>
+        </div>
+
+        <!-- Preview Box -->
+        <div class="bib-preview-box hidden" id="bib-preview-container">
+          <div class="preview-top-bar">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="badge badge-primary" id="bib-source-badge">DOI</span>
+              <span style="font-family:var(--font-mono); font-weight:700; color:#fff;" id="bib-key-badge">\cite{chave}</span>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-outline btn-xs" id="btn-copy-cite">Copiar \cite</button>
+              <button class="btn btn-primary btn-xs" id="btn-insert-cite-cursor">Inserir no Texto</button>
+            </div>
+          </div>
+
+          <textarea class="code-textarea" id="bib-preview-code"></textarea>
+
+          <button class="btn btn-success" id="btn-insert-bib" style="width:100%; justify-content:center; margin-top:8px;">
+            + Adicionar ao references.bib
+          </button>
+        </div>
+
+        <!-- Catalog of References in project -->
+        <div class="catalog-section">
+          <div class="catalog-title">
+            <span>Referências no references.bib</span>
+            <input type="text" class="text-input" id="bib-catalog-search" placeholder="Filtrar..." style="max-width:160px; padding:3px 6px; font-size:0.75rem;">
+          </div>
+          <div class="bib-catalog-list" id="bib-catalog-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. AI Assistant Modal -->
+  <div class="modal-overlay hidden" id="ai-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          Assistente de Layout e Tabelas (IA)
+        </div>
+        <button class="modal-close" id="ai-modal-close">&times;</button>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="modal-tab-btn active" data-tab="layout">Ajustar Layout / Floats</button>
+        <button class="modal-tab-btn" data-tab="table">Gerar Tabela Booktabs</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Tab 1: Layout -->
+        <div class="modal-tab-pane active" id="pane-ai-layout">
+          <textarea class="code-textarea" id="ai-layout-input" style="height:100px;" placeholder="Cole o código TeX da figura, tabela ou texto flutuante..."></textarea>
+          <input type="text" class="text-input" id="ai-layout-instructions" placeholder="Instrução opcional (ex: 'colocar subfigures lado a lado')">
+          <button class="btn btn-primary" id="btn-run-ai-layout" style="width:100%; justify-content:center; margin-top:8px;">Otimizar com IA</button>
+          
+          <div id="ai-layout-result-box" class="bib-preview-box hidden" style="margin-top:10px;">
+            <div style="font-size:0.75rem; color:#a7f3d0; margin-bottom:6px;" id="ai-layout-explanation"></div>
+            <textarea class="code-textarea" id="ai-layout-output" style="height:110px;"></textarea>
+            <button class="btn btn-success btn-xs" id="btn-apply-ai-layout" style="margin-top:6px;">Inserir no Editor</button>
+          </div>
+        </div>
+
+        <!-- Tab 2: Table Booktabs -->
+        <div class="modal-tab-pane" id="pane-ai-table">
+          <textarea class="code-textarea" id="ai-table-input" style="height:100px;" placeholder="Cole dados CSV, texto tabulado ou tabela básica..."></textarea>
+          <button class="btn btn-primary" id="btn-run-ai-table" style="width:100%; justify-content:center; margin-top:8px;">Gerar Tabela Booktabs</button>
+
+          <div id="ai-table-result-box" class="bib-preview-box hidden" style="margin-top:10px;">
+            <div style="font-size:0.75rem; color:#a7f3d0; margin-bottom:6px;" id="ai-table-explanation"></div>
+            <textarea class="code-textarea" id="ai-table-output" style="height:110px;"></textarea>
+            <button class="btn btn-success btn-xs" id="btn-apply-ai-table" style="margin-top:6px;">Inserir Tabela no Editor</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- App Entrypoint Script (ES Modules) -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>

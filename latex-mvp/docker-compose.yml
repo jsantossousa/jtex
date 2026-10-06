@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  latex-studio:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: latex_collaborative_studio
+    ports:
+      - "8000:8000"
+    environment:
+      - ROUTER_URL=${ROUTER_URL:-https://api.openai.com/v1}
+      - ROUTER_MODEL=${ROUTER_MODEL:-gpt-4o-mini}
+      - ROUTER_API_KEY=${ROUTER_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Live-reload development mount
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+      - latex_tmp_runs:/tmp/latex_runs
+    restart: unless-stopped
+
+volumes:
+  latex_tmp_runs:

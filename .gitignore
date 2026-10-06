@@ -1,0 +1,29 @@
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Logs and ephemeral run files
+*.log
+*.aux
+*.out
+*.toc
+*.bbl
+*.blg
+tmp/
+/tmp/
+
+# Environment variables
+.env
+.env.local
+
+# OS & Editor
+.DS_Store
+.idea/
+.vscode/

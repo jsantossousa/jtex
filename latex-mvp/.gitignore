@@ -1,0 +1,19 @@
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Logs
+*.log
+*.aux
+*.out
+*.toc
+*.bbl
+*.blg
+
+# Environment
+.env
